@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Init Page</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+    }
+    .content {
+      width: 100vw;
+      height: 100vh;
+      background-color:antiquewhite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .content-dialog {
+      width: 40rem;
+      min-height: 20rem;
+      border-radius: 5px;
+      background-color: #fff;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    .content-dialog form {
+      display: block;
+      border: 1px solid #e8e8e8;
+      border-radius: 5px;
+      padding: 1em 2em;
+      box-sizing: border-box;
+    }
+    .content-dialog form > p {
+      display: flex;
+    }
+    .content-dialog > p:last-child {
+      text-align: right;
+      margin-bottom: 0;
+    }
+    .content-dialog > p:last-child > input {
+      padding: .5em 1em;
+      border: 1px solid #e8e8e8;
+      outline: 0;
+      cursor: pointer;
+    }
+    .content-dialog > p:last-child > input:active {
+      box-shadow: inset 0 0 .1em .1em #e8e8e8;
+    }
+    .content-dialog form > p > label {
+      display: block;
+      width: 10rem;
+    }
+    .content-dialog form > p > input {
+      flex: 1;
+      outline: 0;
+      height: 1.5rem;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      text-indent: .5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <div class="content-dialog">
+      <p>请输入初始化账号密码：</p>
+      <form>
+        <p>
+          <label for="username">账号：</label><input id="username" type="text"/>
+        </p>
+        <p>
+          <label for="password-1">密码：</label><input id="password-1" type="password"/>
+        </p>
+        <p>
+          <label for="password-2">再次输入：</label><input id="password-2" type="password"/>
+        </p>
+      </form>
+      <p>
+        <input type="button" id="submit" value="确 认"/>
+      </p>
+    </div>
+  </div>
+  <script>
+    (function(win, doc) {
+      const $confirmBtn = doc.querySelector('#submit'),
+        $username = doc.querySelector('#username'),
+        $password1 = doc.querySelector('#password-1'),
+        $password2 = doc.querySelector('#password-2')
+
+      $confirmBtn.addEventListener('click', function(ev) {
+        const userName = $username.value, 
+          p1 = $password1.value, 
+          p2 = $password2.value
+        if (!userName || !p1 || !p2) {
+          alert('请填写账号密码！')
+          return
+        }
+        if (p1 !== p2) {
+          alert('两次输入的密码不一致，请重新输入!')
+          return
+        } else {
+          const xhr = new XMLHttpRequest()
+          xhr.open('POST', '/user/init')
+          xhr.setRequestHeader("Content-type", "application/json")
+          xhr.send(JSON.stringify({
+            userName: userName,
+            password: p1
+          }))
+        }
+      })
+    })(window, document)
+  </script>
+</body>
+</html>
