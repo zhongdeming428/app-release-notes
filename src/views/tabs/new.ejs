@@ -1,0 +1,30 @@
+<style>
+#editor {
+  width: 100%;
+  height: 100%;
+  background: aliceblue;
+  padding: 2rem;
+}
+</style>
+
+<div id="editor">
+  this is the new page
+</div>
+
+<!-- TODO: -->
+<link rel="stylesheet" href="https://note.youdao.com/editor/collab/bulbeditor/bulb.min.css">
+<script type="text/javascript" src="https://note.youdao.com/editor/collab/bulbeditor/bulb.min.js"></script>
+<script type="text/javascript">
+(authBulbEditor({
+    url: 'http://updateinfo.youdao.com/editorapi',
+    pkn: 'com.youdao.com',
+    appKey: appKey,
+    version: 'v1',
+    sdkVersion: 'v1',
+    appSecret: appSecret,
+})).then((BulbEditor) => {
+    editor = new BulbEditor({
+        el: document.getElementById('editor-container'),
+    });
+}) 
+</script>

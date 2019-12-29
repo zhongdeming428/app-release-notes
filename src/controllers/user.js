@@ -20,7 +20,10 @@ router.post('/user/init', (req, res) => {
         maxAge: 3600000 * 2 // 2 hours
       })
       cache.set('token', token, 7200)
-      return res.redirect('/')
+      return res.json({
+        code: 0,
+        msg: 'ok'
+      })
     })
     .catch(err => {
       return res.status(502).json({

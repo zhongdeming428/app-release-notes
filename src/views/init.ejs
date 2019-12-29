@@ -107,6 +107,15 @@
           const xhr = new XMLHttpRequest()
           xhr.open('POST', '/user/init')
           xhr.setRequestHeader("Content-type", "application/json")
+          xhr.onreadystatechange = function(event) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+              const res = JSON.parse(xhr.responseText)
+              if (res.code === 0) 
+                window.location.href = '/'
+              else 
+                alert('Error:' + res.msg)
+            }
+          }
           xhr.send(JSON.stringify({
             userName: userName,
             password: p1
