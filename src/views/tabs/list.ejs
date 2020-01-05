@@ -1,0 +1,89 @@
+<style>
+.list-container {
+  padding: 2em;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.list-container > table {
+  width: 100%;
+}
+.indicator {
+  float: right;
+  padding: 5px 0;
+}
+</style>
+
+<div class="list-container">
+  <table class="pure-table pure-table-horizontal">
+    <thead>
+      <th>#</th>
+      <th>标题</th>
+      <th>作者</th>
+      <th>创建时间</th>
+      <th>修改时间</th>
+      <th>查看</th>
+    </thead>
+    <tbody>
+      <% list.forEach((note, index) => { %>
+        <tr>
+          <td><%= index + 1%></td>
+          <td><%= note.title %></td>
+          <td><%= note.author %></td>
+          <td><%= note.create_time %></td>
+          <td><%= note.update_time %></td>
+          <td>
+            <a href="/?tab=new&id=<%= note.id %>">编辑</a>
+            <a href="javascript:void(0)" class="del" onclick="del()" data-id="<%= note.id %>">删除</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table class="pure-table pure-table-horizontal">
+  <div class="indicator">
+    <span>
+      <a href="javascript:void(0)" id="prev">上一页</a>
+    </span>
+    <span>第 <%= index %> 页</span>
+    <span>共 <%= total %> 页</span>
+    <span>
+      <a href="javascript:void(0)" id="next">下一页</a>
+    </span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const getParams = () => {
+      const res = {}
+      location.search.substring(1).split('&').forEach(kv => {
+        const [k, v] = kv.split('=')
+        res[k] = v
+      })
+      return res
+    }
+    const del = function(e) {
+      fetch(`/note?id=${e.target.dataset.id}`, {
+        method: 'DELETE'
+      }).then(res => res.json())
+        .then(res => {
+          if (res.code !== 0) {
+            alert(res.msg)
+          } else {
+            window.location.reload()
+          }
+        })
+    }
+    const $del = document.querySelectorAll('.del') 
+    $del.length && $del.forEach(d => {
+      d.addEventListener('click', del)
+    })
+    const { limit = 10, offset = 0 } = getParams()
+    document.querySelector('#prev').addEventListener('click', function() {
+      window.location.href = `/?tab=list&limit=${limit}&offset=${+offset - +limit >= 0 ? +offset - +limit : +offset}`
+    })
+    document.querySelector('#next').addEventListener('click', function() {
+      window.location.href = `/?tab=list&limit=${limit}&offset=${+offset + +limit}`
+    })
+  })()
+</script>

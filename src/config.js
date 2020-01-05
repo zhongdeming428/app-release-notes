@@ -7,11 +7,17 @@ module.exports = {
       database: 'd_app_release_notes',
       connectionLimit: 10,
       multipleStatements: true,
-      debug: true
+      debug: false
+    },
+    memcached: {
+      host: '127.0.0.1',
+      port: 11211
     },
     secret: '__private_secret_key__'
   },
   prod: {
-    db: {}
+    db: {},
+    memcached: {},
+    secret: ''
   }
 }

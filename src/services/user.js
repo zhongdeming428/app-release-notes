@@ -6,6 +6,11 @@ class User {
 
     return execSql(sql)
   }
+
+  static login(userName, password) {
+    const sql = `SELECT COUNT(*) AS count FROM d_app_release_notes.t_user WHERE username=${escape(userName)} AND password=${escape(password)};`
+    return execSql(sql)
+  }
 }
 
 module.exports = User

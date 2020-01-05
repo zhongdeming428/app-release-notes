@@ -1,30 +1,166 @@
 <style>
-#editor {
-  width: 100%;
-  height: 100%;
-  background: aliceblue;
-  padding: 2rem;
-}
+  .new-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2em;
+    box-sizing: border-box;
+  }
+  #editor {
+    flex: 1;
+    height: 100%;
+    padding: 0 4rem 2rem 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  #simulator-container {
+    width: 350px;
+    height: 760px;
+    background: url(/images/simulator.png) no-repeat;
+    background-size: cover;
+    padding: 100px 12px;
+    box-sizing: border-box;
+  }
+  #simulator,
+  #simulator > div {
+    background: white;
+    width: 100%;
+    height: 100%;
+  }
+  #simulator {
+    overflow-y: auto;
+  }
+  .border-shallow {
+    border: 1px solid #e8e8e8;
+  }
+
+  /* table 样式 */
+  table {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+  }
+  table td,
+  table th {
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    padding: 3px 5px;
+  }
+  table th {
+    border-bottom: 2px solid #ccc;
+    text-align: center;
+  }
+
+  /* blockquote 样式 */
+  blockquote {
+    display: block;
+    border-left: 8px solid #d0e5f2;
+    padding: 5px 10px;
+    margin: 10px 0;
+    line-height: 1.4;
+    font-size: 100%;
+    background-color: #f1f1f1;
+  }
+
+  /* code 样式 */
+  code {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    background-color: #f1f1f1;
+    border-radius: 3px;
+    padding: 3px 5px;
+    margin: 0 3px;
+  }
+  pre code {
+    display: block;
+  }
+
+  /* ul ol 样式 */
+  ul, ol {
+    margin: 10px 0 10px 20px;
+  }
 </style>
 
-<div id="editor">
-  this is the new page
+<div class="new-container">
+  <div id="editor">
+    <div style="padding: 5px 0;" class="pure-form">
+      <label for="title">标题：</label>
+      <input type="text" class="pure-input-1-4" id="title" placeholder="请输入标题">
+      <button class="pure-button pure-button-primary" style="float: right;" id="save">保存</button>
+    </div>
+    <div class="border-shallow" id="header-bar"></div>
+    <div class="border-shallow" id="textarea" style="flex: 1;border-top: 0;"></div>
+  </div>
+  <div id="simulator-container">
+    <div id="simulator">
+      <div></div>
+    </div>
+  </div>
 </div>
 
-<!-- TODO: -->
-<link rel="stylesheet" href="https://note.youdao.com/editor/collab/bulbeditor/bulb.min.css">
-<script type="text/javascript" src="https://note.youdao.com/editor/collab/bulbeditor/bulb.min.js"></script>
-<script type="text/javascript">
-(authBulbEditor({
-    url: 'http://updateinfo.youdao.com/editorapi',
-    pkn: 'com.youdao.com',
-    appKey: appKey,
-    version: 'v1',
-    sdkVersion: 'v1',
-    appSecret: appSecret,
-})).then((BulbEditor) => {
-    editor = new BulbEditor({
-        el: document.getElementById('editor-container'),
-    });
-}) 
+<script src="https://unpkg.com/wangeditor@3.1.1/release/wangEditor.min.js"></script>
+<script>
+  (function() {
+    const E = window.wangEditor
+    const div1 = document.querySelector('#header-bar'),
+      div2 = document.querySelector('#textarea')
+    const editor2 = new E(div1, div2)
+    const simulator = document.querySelector('#simulator > div')
+    editor2.customConfig.onchange = function (html) {
+      simulator.innerHTML = html
+    }
+    editor2.customConfig.uploadImgServer = '/upload'
+    editor2.customConfig.uploadImgMaxLength = 12
+    editor2.customConfig.uploadFileName = 'images'
+    editor2.create()
+
+    const getParams = () => {
+      const res = {}
+      window.location.search.substring(0).split('&').forEach(kv => {
+        const [k, v] = kv.split('=')
+        res[k] = v
+      })
+      return res
+    }
+
+    document.querySelector('#save').addEventListener('click', function() {
+      const { id } = getParams()
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', '/note')
+      xhr.setRequestHeader("Content-Type", "application/json")
+      xhr.onreadystatechange = function(event) {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText)
+          if (res.code === 0) 
+            window.location.href = '/'
+          else 
+            alert('Error:' + res.msg)
+        }
+      }
+      xhr.send(JSON.stringify({
+        id,
+        note: editor2.txt.html(),
+        title: document.querySelector('#title').value
+      }))
+    })
+
+    if (window.location.search.includes('id')) {
+      const { id } = getParams()
+      const note = fetch('/note?id=' + id)
+        .then(res => res.json())
+        .then(res => {
+          if (res.code === 0) {
+            const { note, total } = res.data
+            document.querySelector('#title').value = note.title
+            editor2.txt.html(note.content)
+            console.log(total)
+          } else {
+            alert(`Error: ${res.msg}`)
+          }
+        })
+    }
+  })()
 </script>

@@ -2,7 +2,6 @@ const express = require('express')
 const routers = require('./controllers')
 const { readFileSync } = require('fs')
 const { resolve } = require('path')
-const bodyParser = require('body-parser')
 
 class App {
   constructor() {
@@ -38,6 +37,7 @@ class App {
     this.app.use(express.json())
     this.app.use(require('cookie-parser')())
     this.app.use(require('./middlewares/init'))
+    this.app.use('/', express.static(resolve(__dirname, './public')))
   }
 }
 
