@@ -104,8 +104,10 @@ router.get('/note', async (req, res) => {
   })
 })
 
-router.delete('/note', (req, res) => {
-  // TODO: delete the relative html file
+router.delete('/note', async (req, res) => {
+  const note = (await noteService.get(req.query.id))[0]
+  const { path } = note
+  execSync(`rm -rf ${resolve(__dirname, '../../notes', `${path}.html`)}`)
   noteService.delete(req.query.id).then(result => {
     return res.json({
       code: 0,
